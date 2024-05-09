@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION INTEGDEV.F_MASKING(IN_DATA IN varchar2, IN_TYPE IN varchar2)
+CREATE OR REPLACE FUNCTION  Fn_MASKING_NO(IN_DATA IN varchar2, IN_TYPE IN varchar2)
       RETURN varchar2
 IS
      RS VARCHAR2(20);   --  RETURN VALUE
@@ -13,14 +13,14 @@ BEGIN
      ELSIF V_TYPE = 'IP' THEN /*IP주소: 123.123.123.123 -> 123.***.***.123 */
          RS := REGEXP_REPLACE(IN_DATA, '([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})', '\1.***.***.\4') ;
 
---     ELSIF V_TYPE = 'PHONE' THEN /*전화번호: 010-1234-5678 -> 010-****-5678 */
---        IF LENGTH(REGEXP_REPLACE(IN_DATA,'[^[:DIGIT:]]')) IN (7,8) THEN
---            RS := REGEXP_REPLACE(REGEXP_REPLACE(IN_DATA,'[^[:DIGIT:]]'), '([0-9]{3,4})([0-9]{4})','****-\2' ) ;
---        ELSIF LENGTH(REGEXP_REPLACE(IN_DATA,'[^[:DIGIT:]]')) IN (11,12) THEN
---            RS := REGEXP_REPLACE(REGEXP_REPLACE(IN_DATA,'[^[:DIGIT:]]'), '(0[0-9]{1,2})([0-9]{3,4})([0-9]{4})','\1-****-\3' ) ;
---        ELSE
---            RS := REGEXP_REPLACE(REGEXP_REPLACE(IN_DATA,'[^[:DIGIT:]]'), '(001|002|007[0-9]{2})([0-9]{2})([0-9]+)([0-9]{4})','\1-*******-\4' ) ;
---        END IF;
+     ELSIF V_TYPE = 'PHONE' THEN /*전화번호: 010-1234-5678 -> 010-****-5678 */
+        IF LENGTH(REGEXP_REPLACE(IN_DATA,'[^[:DIGIT:]]')) IN (7,8) THEN
+            RS := REGEXP_REPLACE(REGEXP_REPLACE(IN_DATA,'[^[:DIGIT:]]'), '([0-9]{3,4})([0-9]{4})','****-\2' ) ;
+        ELSIF LENGTH(REGEXP_REPLACE(IN_DATA,'[^[:DIGIT:]]')) IN (11,12) THEN
+            RS := REGEXP_REPLACE(REGEXP_REPLACE(IN_DATA,'[^[:DIGIT:]]'), '(0[0-9]{1,2})([0-9]{3,4})([0-9]{4})','\1-****-\3' ) ;
+        ELSE
+            RS := REGEXP_REPLACE(REGEXP_REPLACE(IN_DATA,'[^[:DIGIT:]]'), '(001|002|007[0-9]{2})([0-9]{2})([0-9]+)([0-9]{4})','\1-*******-\4' ) ;
+        END IF;
      ELSIF V_TYPE IN ( 'TEL', 'PHONE') THEN /*일반 전화번호: 02-1234-5678 -> 031-****-5678 */
            RS := CASE WHEN LENGTH(NVL(IN_DATA, 0)) < 4 THEN IN_DATA  -- NULL 이거나 3자릿수 이하면 그냥
                       WHEN SUBSTR(IN_DATA, 1,2 ) = '02' THEN REGEXP_REPLACE(IN_DATA, '([[:digit:]]{2})([[:digit:]]{4})([[:digit:]]{3,})', '\1****\3')  -- 전화번호 앞이 02 서울이면
